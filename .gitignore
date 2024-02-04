@@ -1,4 +1,6 @@
 HELP.md
+.env
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -13,7 +15,6 @@ target/
 .springBeans
 .sts4-cache
 
-.env
 
 ### IntelliJ IDEA ###
 .idea
