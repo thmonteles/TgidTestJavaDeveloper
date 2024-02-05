@@ -17,6 +17,8 @@ public class Transaction {
     @ManyToOne
     private Company company;
     private BigDecimal amount;
+
+    @Column
     private LocalDateTime timestamp;
 
     public Long getId() {
@@ -60,6 +62,14 @@ public class Transaction {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public static Transaction from(Company company, Client client, BigDecimal amount) {
+        var transaction = new Transaction();
+        transaction.setCompany(company);
+        transaction.setClient(client);
+        transaction.setAmount(amount);
+        return transaction;
     }
 }
 
