@@ -37,10 +37,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         var calculatedFeeFromAmount = calculateDynamicFeeFromCompanyFee(company, dto.amount());
         var totalAmountForTransaction = calculateFinalAmountFromFee(dto.amount(), calculatedFeeFromAmount);
-        var checkIfBalanceIsSufficientToTransaction = balanceIsSufficient(company, totalAmountForTransaction);
+        var checkIfBalanceIsInsufficientToTransaction = balanceIsInsufficient(company, totalAmountForTransaction);
 
-        if (checkIfBalanceIsSufficientToTransaction)
-            throw new TransactionServiceException("balance amount from this company is insufficient for this transaction");
+        if (checkIfBalanceIsInsufficientToTransaction)
+            throw new TransactionServiceException("Insufficient balance amount for this company");
 
         var transaction = Transaction.from(company, client, totalAmountForTransaction);
         updateCompanyBalance(company, totalAmountForTransaction);
@@ -48,22 +48,22 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    private static BigDecimal calculateDynamicFeeFromCompanyFee(Company company, BigDecimal amount) {
+    static BigDecimal calculateDynamicFeeFromCompanyFee(Company company, BigDecimal amount) {
         return amount
                 .multiply(BigDecimal.valueOf(company.getFee()));
     }
 
-    private static BigDecimal calculateFinalAmountFromFee(BigDecimal rawAmount, BigDecimal fee) {
+    static BigDecimal calculateFinalAmountFromFee(BigDecimal rawAmount, BigDecimal fee) {
         return rawAmount.add(fee);
     }
 
-    private static boolean balanceIsSufficient(Company company, BigDecimal amount) {
+    static boolean balanceIsInsufficient(Company company, BigDecimal amount) {
         return company
                 .getBalance()
                 .compareTo(amount) < 0;
     }
 
-    private void updateCompanyBalance(Company company, BigDecimal totalAmountForTransaction) {
+    void updateCompanyBalance(Company company, BigDecimal totalAmountForTransaction) {
         var newBalance = company
                 .getBalance()
                 .add(totalAmountForTransaction);
