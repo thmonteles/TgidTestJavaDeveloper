@@ -7,19 +7,21 @@ import br.com.tgid.TgidTestJavaDeveloper.repositories.CompanyRepository;
 import br.com.tgid.TgidTestJavaDeveloper.services.CompanyService;
 import br.com.tgid.TgidTestJavaDeveloper.utils.CNPJUtil;
 import br.com.tgid.TgidTestJavaDeveloper.utils.CPFUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
-    @Autowired
-    CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository) {
+        this.companyRepository = companyRepository;
+    }
 
     @Override
     public boolean create(CreateCompanyDTO dto) throws CompanyServiceException {
         var cnpjWithoutInvalidCharacters = CNPJUtil.cleaning(dto.cnpj());
 
-        if (!CPFUtil.validate(cnpjWithoutInvalidCharacters)) {
+        if (!CNPJUtil.validate(cnpjWithoutInvalidCharacters)) {
             throw new CompanyServiceException("invalid cnpj format cnpj: " + dto.cnpj());
         }
 
