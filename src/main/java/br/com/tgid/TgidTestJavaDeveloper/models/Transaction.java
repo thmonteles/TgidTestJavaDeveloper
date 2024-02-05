@@ -2,6 +2,7 @@ package br.com.tgid.TgidTestJavaDeveloper.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +16,7 @@ public class Transaction {
 
     @ManyToOne
     private Company company;
-    private double amount;
+    private BigDecimal amount;
     private LocalDateTime timestamp;
 
     public Long getId() {
@@ -45,11 +46,11 @@ public class Transaction {
         this.company = company;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
