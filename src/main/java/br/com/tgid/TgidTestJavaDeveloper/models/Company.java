@@ -6,6 +6,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.br.CNPJ;
 
+import java.math.BigDecimal;
+
 
 @Entity
 @Table(name= "Companies")
@@ -15,7 +17,7 @@ public class Company extends User {
     @Column(unique = true, length = 14)
     @CNPJ(message = "Invalid CNPJ format")
     private String cnpj;
-    private double balance;
+    private BigDecimal balance;
     private double fee;
 
     public Company() {
@@ -31,11 +33,11 @@ public class Company extends User {
     }
 
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
