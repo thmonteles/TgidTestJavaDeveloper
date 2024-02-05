@@ -25,6 +25,8 @@ class UserTest {
                 .name("Rick Sanchez")
                 .email("ricksanchez@hbo.com")
                 .phone("+5511444444444")
+                .cpf("51579787070")
+                .password("test")
                 .build();
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -38,6 +40,8 @@ class UserTest {
                 .name("")
                 .email("ricksanchez@hbo.com")
                 .phone("+5511444444444")
+                .cpf("51579787070")
+                .password("test")
                 .build();
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -52,6 +56,8 @@ class UserTest {
                 .name("Alice Wonderland")
                 .email("invalid-email")
                 .phone("+5511444444444")
+                .cpf("51579787070")
+                .password("test")
                 .build();
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -66,6 +72,8 @@ class UserTest {
                 .name("Alice Wonderland")
                 .email("")
                 .phone("+5511444444444")
+                .cpf("51579787070")
+                .password("test")
                 .build();
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -80,6 +88,8 @@ class UserTest {
                 .name("Bob Builder")
                 .email("bob.builder@example.com")
                 .phone("invalid-phone")
+                .cpf("51579787070")
+                .password("test")
                 .build();
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -88,7 +98,7 @@ class UserTest {
     }
 
     private static class TestUserBuilder {
-        private final User user = new Client();
+        private final Client user = new Client();
 
         public TestUserBuilder id(Long id) {
             user.setId(id);
@@ -105,8 +115,19 @@ class UserTest {
             return this;
         }
 
+        public TestUserBuilder cpf(String CPF) {
+            user.setCpf(CPF);
+            return this;
+        }
+
+
         public TestUserBuilder phone(String phone) {
             user.setPhone(phone);
+            return this;
+        }
+
+        public TestUserBuilder password(String password) {
+            user.setPassword(password);
             return this;
         }
 
