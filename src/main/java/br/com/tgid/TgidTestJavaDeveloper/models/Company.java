@@ -1,5 +1,7 @@
 package br.com.tgid.TgidTestJavaDeveloper.models;
 
+import br.com.tgid.TgidTestJavaDeveloper.DTOs.CreateClientDTO;
+import br.com.tgid.TgidTestJavaDeveloper.DTOs.CreateCompanyDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -10,7 +12,7 @@ import java.math.BigDecimal;
 
 
 @Entity
-@Table(name= "Companies")
+@Table(name = "Companies")
 public class Company extends User {
 
     @NotBlank(message = "This field cnpj cannot be empty")
@@ -47,6 +49,19 @@ public class Company extends User {
 
     public void setFee(double fee) {
         this.fee = fee;
+    }
+
+    public static Company fromDTO(CreateCompanyDTO dto) {
+        var company = new Company();
+        company.setCnpj(dto.cnpj());
+        company.setFee(dto.fee());
+        company.setEmail(dto.email());
+        company.setPhone(dto.phone());
+        company.setBalance(new BigDecimal(0));
+        company.setPassword(dto.password());
+
+        return company;
+
     }
 }
 
