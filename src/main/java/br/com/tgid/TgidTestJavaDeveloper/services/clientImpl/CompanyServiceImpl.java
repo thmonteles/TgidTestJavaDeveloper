@@ -1,5 +1,6 @@
 package br.com.tgid.TgidTestJavaDeveloper.services.clientImpl;
 
+import br.com.tgid.TgidTestJavaDeveloper.DTOs.CompanyResponseDTO;
 import br.com.tgid.TgidTestJavaDeveloper.DTOs.CreateCompanyDTO;
 import br.com.tgid.TgidTestJavaDeveloper.exceptions.CompanyServiceException;
 import br.com.tgid.TgidTestJavaDeveloper.models.Company;
@@ -8,6 +9,8 @@ import br.com.tgid.TgidTestJavaDeveloper.services.CompanyService;
 import br.com.tgid.TgidTestJavaDeveloper.utils.CNPJUtil;
 import br.com.tgid.TgidTestJavaDeveloper.utils.CPFUtil;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -25,12 +28,22 @@ public class CompanyServiceImpl implements CompanyService {
             throw new CompanyServiceException("invalid cnpj format cnpj: " + dto.cnpj());
         }
 
-        var company = companyRepository.findByCnpj(dto.cnpj());
+        var company = companyRepository.findByCnpj(cnpjWithoutInvalidCharacters);
 
         if (company.isPresent()) {
             throw new CompanyServiceException("company already exists with this cnpj: " + dto.cnpj());
         }
         var newCompany = Company.fromDTO(dto);
         return companyRepository.save(newCompany) != null;
+    }
+
+    @Override
+    public List<CompanyResponseDTO> listAllCompanies() throws CompanyServiceException {
+        return companyRepository
+                .findAll()
+                .stream()
+                .map(company -> new CompanyResponseDTO(company.getName(), company.getCnpj()))
+                .toList();
+
     }
 }
