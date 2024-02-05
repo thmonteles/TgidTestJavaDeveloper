@@ -59,7 +59,7 @@ public class Company extends User {
         company.setName(dto.name());
         company.setEmail(dto.email());
         company.setPhone(dto.phone());
-        company.setBalance(new BigDecimal(0));
+        company.setBalance(BigDecimal.ZERO);
         company.setPassword(dto.password());
 
         return company;

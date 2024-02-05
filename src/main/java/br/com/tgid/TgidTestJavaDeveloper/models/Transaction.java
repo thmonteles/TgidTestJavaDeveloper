@@ -18,6 +18,12 @@ public class Transaction {
     private Company company;
     private BigDecimal amount;
 
+    @Column(name = "raw_amount")
+    private BigDecimal rawAmount;
+
+    @Column(name = "fee_applied_on_this_operation")
+    private double feeAppliedOnThisOperation;
+
     @Column
     private LocalDateTime timestamp;
 
@@ -64,11 +70,29 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public static Transaction from(Company company, Client client, BigDecimal amount) {
+    public BigDecimal getRawAmount() {
+        return rawAmount;
+    }
+
+    public void setRawAmount(BigDecimal rawAmount) {
+        this.rawAmount = rawAmount;
+    }
+
+    public double getFeeAppliedOnThisOperation() {
+        return feeAppliedOnThisOperation;
+    }
+
+    public void setFeeAppliedOnThisOperation(double feeAppliedOnThisOperation) {
+        this.feeAppliedOnThisOperation = feeAppliedOnThisOperation;
+    }
+
+    public static Transaction from(Company company, Client client, BigDecimal amount, BigDecimal rawAmount, double fee ) {
         var transaction = new Transaction();
         transaction.setCompany(company);
         transaction.setClient(client);
         transaction.setAmount(amount);
+        transaction.setRawAmount(rawAmount);
+        transaction.setFeeAppliedOnThisOperation(fee);
         return transaction;
     }
 }

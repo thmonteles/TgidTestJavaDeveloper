@@ -40,8 +40,8 @@ class TransactionServiceImplTest {
 
     @Test
     void processSuccessfulTransaction() throws TransactionServiceException {
-        var expectedValueTransaction = new BigDecimal("12.240");
-        var expectedCompanyBalanceTransaction = new BigDecimal("312.240");
+        var expectedValueTransaction = BigDecimal.valueOf(11.76);
+        var expectedCompanyBalanceTransaction = BigDecimal.valueOf(311.76);
         CreateTransactionDTO dto = new CreateTransactionDTO("clientCpf", "companyCnpj", BigDecimal.valueOf(12.0D));
         Client client = new Client();
         Company company = new Company();
@@ -54,8 +54,8 @@ class TransactionServiceImplTest {
 
         Transaction result = transactionService.process(dto);
 
-        assertEquals(expectedValueTransaction, result.getAmount());
-        assertEquals(expectedCompanyBalanceTransaction, result.getCompany().getBalance());
+        assertEquals(expectedValueTransaction, result.getAmount().setScale(2, RoundingMode.HALF_EVEN));
+        assertEquals(expectedCompanyBalanceTransaction, result.getCompany().getBalance().setScale(2, RoundingMode.HALF_EVEN));
         assertNotNull(result);
         verify(companyRepository, times(1)).save(any(Company.class));
         verify(transactionRepository, times(1)).save(any(Transaction.class));
@@ -81,10 +81,10 @@ class TransactionServiceImplTest {
 
     @Test
     void processWithInsufficientBalance() {
-        CreateTransactionDTO dto = new CreateTransactionDTO("000.000.000.00", "51.501.889/0001-21", BigDecimal.TEN);
+        CreateTransactionDTO dto = new CreateTransactionDTO("000.000.000.00", "51.501.889/0001-21", BigDecimal.valueOf(-100.0));
         Client client = new Client();
         Company company = new Company();
-        company.setBalance(BigDecimal.ONE);
+        company.setBalance(BigDecimal.valueOf(12));
         company.setFee(0.2);
         when(clientRepository.findByCpf(CPFUtil.cleaning(dto.clientCpf()))).thenReturn(Optional.of(client));
         when(companyRepository.findByCnpj(CNPJUtil.cleaning(dto.companyCnpj()))).thenReturn(Optional.of(company));
@@ -92,55 +92,5 @@ class TransactionServiceImplTest {
         assertEquals("Insufficient balance amount for this company", exception.getMessage());
     }
 
-    @Test
-    void testCalculateDynamicFeeFromCompanyFee() {
-        Company company = new Company();
-        company.setFee(0.02);
-        BigDecimal amount = BigDecimal.valueOf(100.0);
 
-        BigDecimal result = TransactionServiceImpl.calculateDynamicFeeFromCompanyFee(company, amount);
-
-        assertEquals(BigDecimal.valueOf(2.0), result.setScale(1, RoundingMode.HALF_UP));
-    }
-
-    @Test
-    void testCalculateFinalAmountFromFee() {
-        BigDecimal rawAmount = BigDecimal.valueOf(100.0);
-        BigDecimal fee = BigDecimal.valueOf(2.0);
-
-        BigDecimal result = TransactionServiceImpl.calculateFinalAmountFromFee(rawAmount, fee);
-
-        assertEquals(BigDecimal.valueOf(102.0), result);
-    }
-
-    @Test
-    void testBalanceIsInSufficient() {
-        Company company = new Company();
-        company.setBalance(BigDecimal.valueOf(150.0));
-        BigDecimal amount = BigDecimal.valueOf(100.0);
-        boolean result = !TransactionServiceImpl.balanceIsInsufficient(company, amount);
-        assertTrue(result);
-    }
-
-    @Test
-    void testBalanceIsInsufficient() {
-        Company company = new Company();
-        company.setBalance(BigDecimal.valueOf(100.0));
-        BigDecimal amount = BigDecimal.valueOf(190.0);
-        boolean result = TransactionServiceImpl.balanceIsInsufficient(company, amount);
-        assertTrue(result);
-    }
-
-    @Test
-    void testUpdateCompanyBalance() {
-        Company company = new Company();
-        company.setBalance(BigDecimal.valueOf(150.0));
-        BigDecimal totalAmountForTransaction = BigDecimal.valueOf(100.0);
-
-        TransactionServiceImpl transactionService = new TransactionServiceImpl(transactionRepository, companyRepository, clientRepository);
-        transactionService.updateCompanyBalance(company, totalAmountForTransaction);
-        verify(companyRepository, times(1)).save(any(Company.class));
-
-        assertEquals(BigDecimal.valueOf(250.0), company.getBalance());
-    }
 }

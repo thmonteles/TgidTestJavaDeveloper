@@ -14,6 +14,7 @@ import br.com.tgid.TgidTestJavaDeveloper.utils.CPFUtil;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -28,6 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Transaction process(CreateTransactionDTO dto) throws TransactionServiceException {
+        var amount = dto.amount();
         var client = clientRepository.findByCpf(CPFUtil.cleaning(dto.clientCpf()))
                 .orElseThrow(() -> new TransactionServiceException("client not found for this cpf: " + dto.clientCpf()));
 
@@ -35,41 +37,51 @@ public class TransactionServiceImpl implements TransactionService {
                 .findByCnpj(CNPJUtil.cleaning(dto.companyCnpj()))
                 .orElseThrow(() -> new TransactionServiceException("company not found for this cnpj: " + dto.companyCnpj()));
 
-        var calculatedFeeFromAmount = calculateDynamicFeeFromCompanyFee(company, dto.amount());
-        var totalAmountForTransaction = calculateFinalAmountFromFee(dto.amount(), calculatedFeeFromAmount);
-        var checkIfBalanceIsInsufficientToTransaction = balanceIsInsufficient(company, totalAmountForTransaction);
+        var calculatedFeeFromAmount = amount
+                .abs()
+                .multiply(BigDecimal.valueOf(company.getFee()).setScale(2, RoundingMode.HALF_EVEN));
 
-        if (checkIfBalanceIsInsufficientToTransaction)
-            throw new TransactionServiceException("Insufficient balance amount for this company");
+        var thisAmountIsPositive = amount.compareTo(BigDecimal.ZERO) > 0;
+        BigDecimal transactionAmount;
+        if (thisAmountIsPositive) {
+            transactionAmount = processPositiveTransaction(company, amount, calculatedFeeFromAmount);
+        } else {
+            transactionAmount = processNegativeTransaction(company, amount, calculatedFeeFromAmount);
+        }
 
-        var transaction = Transaction.from(company, client, totalAmountForTransaction);
-        updateCompanyBalance(company, totalAmountForTransaction);
+        var transaction = Transaction.from(company, client, transactionAmount, amount, company.getFee());
         return transactionRepository.save(transaction);
     }
 
-
-    static BigDecimal calculateDynamicFeeFromCompanyFee(Company company, BigDecimal amount) {
-        return amount
-                .multiply(BigDecimal.valueOf(company.getFee()));
-    }
-
-    static BigDecimal calculateFinalAmountFromFee(BigDecimal rawAmount, BigDecimal fee) {
-        return rawAmount.add(fee);
-    }
-
-    static boolean balanceIsInsufficient(Company company, BigDecimal amount) {
-        return company
-                .getBalance()
-                .compareTo(amount) < 0;
-    }
-
-    void updateCompanyBalance(Company company, BigDecimal totalAmountForTransaction) {
+    BigDecimal processPositiveTransaction(Company company, BigDecimal amount, BigDecimal calculatedFeeFromAmount) {
+        var totalAmountForTransaction = amount.subtract(calculatedFeeFromAmount);
         var newBalance = company
                 .getBalance()
                 .add(totalAmountForTransaction);
 
         company.setBalance(newBalance);
         companyRepository.save(company);
+        return totalAmountForTransaction;
+    }
+
+    BigDecimal processNegativeTransaction(Company company, BigDecimal amount, BigDecimal calculatedFeeFromAmount) throws TransactionServiceException {
+        var sumOfNegativeAmountWithFee = amount
+                .abs()
+                .add(calculatedFeeFromAmount);
+        var transactionAmount = sumOfNegativeAmountWithFee.negate();
+        var checkIfBalanceIsInsufficientToTransaction = company
+                .getBalance()
+                .compareTo(transactionAmount) >= 0;
+
+        if (checkIfBalanceIsInsufficientToTransaction)
+            throw new TransactionServiceException("Insufficient balance amount for this company");
+
+        var newBalance = company
+                .getBalance()
+                .subtract(sumOfNegativeAmountWithFee);
+        company.setBalance(newBalance);
+        companyRepository.save(company);
+        return transactionAmount;
     }
 
 }
