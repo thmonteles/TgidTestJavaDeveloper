@@ -7,7 +7,7 @@ O Sistema de Transações com Spring Boot é uma aplicação desenvolvida para f
 
 ## Objetivo
 
-Criar um sistema que oferecer funcionalidades para a gestão eficiente de transações, permitindo o registro de transações, consulta de histórico, processamento de transferências entre contas e geração de relatórios financeiros
+Criar um sistema que oferecer funcionalidades para a gestão eficiente de transações, permitindo o registro de transações e processamento de transferências entre contas.
 
 **Árvore do Projeto:**
 
@@ -99,7 +99,7 @@ Dentro da camada de DTO é onde eu estou concentrando os dados para poder trafeg
 
 ### **APIs e Endpoints:**
 
-A API oferece endpoints RESTful para realizar operações como:
+A API oferece endpoints para realizar operações como:
 
 - **`POST/api/user/create` Cria** um cliente.
 
@@ -228,6 +228,7 @@ response success:
     }
 }
 ```
+
 
 ---
 
