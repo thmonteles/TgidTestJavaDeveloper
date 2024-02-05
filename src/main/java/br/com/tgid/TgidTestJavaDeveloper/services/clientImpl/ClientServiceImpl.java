@@ -26,7 +26,7 @@ public class ClientServiceImpl implements ClientService {
             throw new ClientServiceException("invalid cpf format cpf: " + dto.cpf());
         }
 
-        var client = repository.findByEmail(dto.email());
+        var client = repository.findByCpf(cpfWithoutInvalidCharacters);
 
         if (client.isPresent()) {
             throw new ClientServiceException("Client with email '" + dto.email() + "' already exists");
