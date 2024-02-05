@@ -2,10 +2,11 @@ package br.com.tgid.TgidTestJavaDeveloper.controllers;
 
 
 import br.com.tgid.TgidTestJavaDeveloper.DTOs.CreateTransactionDTO;
-import br.com.tgid.TgidTestJavaDeveloper.DTOs.SuccessOrFailureResponse;
 import br.com.tgid.TgidTestJavaDeveloper.DTOs.TransactionResponseDTO;
 import br.com.tgid.TgidTestJavaDeveloper.exceptions.TransactionServiceException;
 import br.com.tgid.TgidTestJavaDeveloper.services.TransactionService;
+import br.com.tgid.TgidTestJavaDeveloper.services.CompanyWebhook;
+import br.com.tgid.TgidTestJavaDeveloper.services.clientImpl.HttpCompanyWebhookImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
