@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDateTime;
 
@@ -27,12 +28,18 @@ public abstract class User {
     @Column(name = "user_type")
     protected UserType userType;
 
+
     @NotBlank(message = "This field email cannot be empty")
     @Email(message = "Please provide a valid email address")
+    @Column(unique = true)
     protected String email;
 
     @Pattern(regexp = "^\\+?[0-9. ()-]*$", message = "The phone number must contain only valid digits and allowed special characters.")
+    @Column(unique = true, length = 15)
     protected String phone;
+
+    @NotBlank(message = "This field password cannot be empty")
+    protected String password;
 
     @PrePersist
     protected void onCreate() {
@@ -100,5 +107,10 @@ public abstract class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public void setPassword(String password) {
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt());;
+    }
+
 
 }
