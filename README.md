@@ -1,6 +1,5 @@
-# Untitled
+# Teste Java Developer TGID 
 
-Status: Não iniciado
 
 ## Descrição do projeto
 
@@ -90,7 +89,6 @@ A estrutura do projeto pode ser resumida da seguinte forma:
 - **Modelos (Models):** Representam as entidades do domínio, como clientes, empresas, transações e usuários.
 - **Repositórios (Repositories):** Lidam com a persistência e recuperação de dados no banco de dados.
 - **Serviços (Services):** Implementam a lógica de negócios, incluindo operações relacionadas a clientes, empresas, webhooks e transações.
-- **Transporte:** Possíveis componentes relacionados ao transporte de dados.
 - **Utilitários (Utils):** Funções utilitárias para validação e manipulação de dados específicos, como CPFs e CNPJs.
 - **Recursos (Resources):** Contém o arquivo de configuração da aplicação e diretórios para recursos estáticos e templates.
 - **Testes:** Inclui testes unitários para garantir a robustez das funcionalidades implementadas.
