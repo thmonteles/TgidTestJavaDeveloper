@@ -2,6 +2,7 @@ package br.com.tgid.TgidTestJavaDeveloper.models;
 
 import br.com.tgid.TgidTestJavaDeveloper.DTOs.CreateClientDTO;
 import br.com.tgid.TgidTestJavaDeveloper.DTOs.CreateCompanyDTO;
+import br.com.tgid.TgidTestJavaDeveloper.utils.CNPJUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -53,7 +54,7 @@ public class Company extends User {
 
     public static Company fromDTO(CreateCompanyDTO dto) {
         var company = new Company();
-        company.setCnpj(dto.cnpj());
+        company.setCnpj(CNPJUtil.cleaning(dto.cnpj()));
         company.setFee(dto.fee());
         company.setEmail(dto.email());
         company.setPhone(dto.phone());
