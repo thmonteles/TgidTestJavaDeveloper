@@ -229,6 +229,13 @@ response success:
 }
 ```
 
+Algumas considerações finais:
+
+Dentro do arquivo `application.properties`, configurei a URI do webhook.site, facilitando a troca, pois segue o mesmo padrão.
+
+Não implementei o sistema de envio de e-mails, pois meu objetivo inicial era usar o RabbitMQ para executar tarefas em 
+segundo plano, processar transações, enviar webhooks para empresas e e-mails, tudo de forma sincronizada e por meio de filas. 
+No entanto, devido à limitação de tempo, essa implementação não foi concluída.
 
 ---
 
