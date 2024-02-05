@@ -9,6 +9,8 @@ import br.com.tgid.TgidTestJavaDeveloper.repositories.ClientRepository;
 import br.com.tgid.TgidTestJavaDeveloper.repositories.CompanyRepository;
 import br.com.tgid.TgidTestJavaDeveloper.repositories.TransactionRepository;
 import br.com.tgid.TgidTestJavaDeveloper.services.TransactionService;
+import br.com.tgid.TgidTestJavaDeveloper.utils.CNPJUtil;
+import br.com.tgid.TgidTestJavaDeveloper.utils.CPFUtil;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,11 +28,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Transaction process(CreateTransactionDTO dto) throws TransactionServiceException {
-        var client = clientRepository.findByCpf(dto.clientCpf())
+        var client = clientRepository.findByCpf(CPFUtil.cleaning(dto.clientCpf()))
                 .orElseThrow(() -> new TransactionServiceException("client not found for this cpf: " + dto.clientCpf()));
 
         var company = companyRepository
-                .findByCnpj(dto.companyCnpj())
+                .findByCnpj(CNPJUtil.cleaning(dto.companyCnpj()))
                 .orElseThrow(() -> new TransactionServiceException("company not found for this cnpj: " + dto.companyCnpj()));
 
         var calculatedFeeFromAmount = calculateDynamicFeeFromCompanyFee(company, dto.amount());
