@@ -8,16 +8,25 @@ import br.com.tgid.TgidTestJavaDeveloper.models.Transaction;
 import br.com.tgid.TgidTestJavaDeveloper.repositories.ClientRepository;
 import br.com.tgid.TgidTestJavaDeveloper.repositories.CompanyRepository;
 import br.com.tgid.TgidTestJavaDeveloper.repositories.TransactionRepository;
+import br.com.tgid.TgidTestJavaDeveloper.services.ClientAlert;
+import br.com.tgid.TgidTestJavaDeveloper.services.CompanyWebhook;
 import br.com.tgid.TgidTestJavaDeveloper.services.TransactionService;
 import br.com.tgid.TgidTestJavaDeveloper.utils.CNPJUtil;
 import br.com.tgid.TgidTestJavaDeveloper.utils.CPFUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
+    @Autowired
+    CompanyWebhook companyWebhook;
+    @Autowired
+    ClientAlert clientAlert;
+
     private final TransactionRepository transactionRepository;
     private final CompanyRepository companyRepository;
     private final ClientRepository clientRepository;
@@ -50,7 +59,14 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         var transaction = Transaction.from(company, client, transactionAmount, amount, company.getFee());
-        return transactionRepository.save(transaction);
+        var savedTransaction =  transactionRepository.save(transaction);
+
+        CompletableFuture<Void> voidCompanyWebhookTask = CompletableFuture.runAsync(() -> companyWebhook.sendTransactionFinished(savedTransaction));
+        CompletableFuture<Void> voidClientAlertTask = CompletableFuture.runAsync(() -> clientAlert.sendEmailFinishTransaction(savedTransaction));
+
+        CompletableFuture.allOf(voidCompanyWebhookTask, voidClientAlertTask);
+
+        return savedTransaction;
     }
 
     BigDecimal processPositiveTransaction(Company company, BigDecimal amount, BigDecimal calculatedFeeFromAmount) {
