@@ -56,6 +56,7 @@ public class Company extends User {
         var company = new Company();
         company.setCnpj(CNPJUtil.cleaning(dto.cnpj()));
         company.setFee(dto.fee());
+        company.setName(dto.name());
         company.setEmail(dto.email());
         company.setPhone(dto.phone());
         company.setBalance(new BigDecimal(0));
