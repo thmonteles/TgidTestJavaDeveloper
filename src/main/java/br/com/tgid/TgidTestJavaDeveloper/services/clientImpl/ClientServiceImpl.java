@@ -29,7 +29,7 @@ public class ClientServiceImpl implements ClientService {
         var client = repository.findByCpf(cpfWithoutInvalidCharacters);
 
         if (client.isPresent()) {
-            throw new ClientServiceException("Client with email '" + dto.email() + "' already exists");
+            throw new ClientServiceException("Client with cpf '" + dto.cpf() + " already exists");
         }
 
         Client newClient = Client.fromDTO(dto);
